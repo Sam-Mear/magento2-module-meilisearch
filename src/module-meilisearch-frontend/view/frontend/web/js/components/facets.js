@@ -10,7 +10,16 @@ define([
 ], function(Component, ko, $, facetsState, searchState, FacetsService, priceUtils) {
     'use strict';
 
-    const meilisearchConfig = window.meilisearchFrontendConfig;
+    const meilisearchConfig = window.meilisearchFrontendConfig || {};
+    if (!window.meilisearchFrontendConfig) {
+        console.warn(
+            '[MeilisearchFrontend] Missing window.meilisearchFrontendConfig; ' +
+            'facets will initialize with empty config.'
+        );
+    }
+    const facetConfig = meilisearchConfig.facets && meilisearchConfig.facets.facetConfig
+        ? meilisearchConfig.facets.facetConfig
+        : {};
 
     return Component.extend({
         defaults: {
@@ -23,11 +32,10 @@ define([
 
             this.computedCurrentFacets = ko.pureComputed(() => {
                 const selected = facetsState.selectedFacets();
-                const config = meilisearchConfig.facets.facetConfig;
                 const result = [];
 
                 Object.entries(selected).forEach(([code, values]) => {
-                    const facetCfg = config[code];
+                    const facetCfg = facetConfig[code];
                     if (!facetCfg) return;
 
                     values.forEach(value => {
@@ -44,10 +52,10 @@ define([
             });
 
             this.computedFacets = ko.pureComputed(() => {
-                const results = searchState.searchResults();
+                const results = searchState.searchResults() || {};
                 const currentFilters = facetsState.selectedFacets();
 
-                const availableFacets = FacetsService.getAvailableFacets(results);
+                const availableFacets = FacetsService.getAvailableFacets(results) || [];
 
                 return availableFacets.map(facet => {
                     const options = ko.observableArray(facet.options);
@@ -69,8 +77,16 @@ define([
                         visibleOptions: visibleOptions,
                         showAllOptions: showAllOptions,
                         hasSelection: hasSelection,
-                        min: ko.observable(results.facetStats?.[facet.code]?.min ?? null),
-                        max: ko.observable(results.facetStats?.[facet.code]?.max ?? null)
+                        min: ko.observable(
+                            results.facetStats && results.facetStats[facet.code]
+                                ? results.facetStats[facet.code].min ?? null
+                                : null
+                        ),
+                        max: ko.observable(
+                            results.facetStats && results.facetStats[facet.code]
+                                ? results.facetStats[facet.code].max ?? null
+                                : null
+                        )
                     };
                 });
             });

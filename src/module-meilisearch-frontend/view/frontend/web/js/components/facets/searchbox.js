@@ -6,12 +6,20 @@ define([
 ], function (Element, ko, Fuse, facetsState) {
     'use strict';
 
-    const meilisearchConfig = window.meilisearchFrontendConfig;
+    const meilisearchConfig = window.meilisearchFrontendConfig || {};
+    if (!window.meilisearchFrontendConfig) {
+        console.warn(
+            '[MeilisearchFrontend] Missing window.meilisearchFrontendConfig; ' +
+            'facet searchbox will initialize with empty config.'
+        );
+    }
 
     return Element.extend({
         initialize: function () {
             this._super();
-            this.facetConfig = meilisearchConfig.facets.facetConfig;
+            this.facetConfig = meilisearchConfig.facets && meilisearchConfig.facets.facetConfig
+                ? meilisearchConfig.facets.facetConfig
+                : {};
             this.fuseInstances = {};
             this.observeFacetChanges();
             return this;
@@ -19,6 +27,9 @@ define([
 
         observeFacetChanges: function() {
             facetsState.computedFacets.subscribe(facets => {
+                if (!Array.isArray(facets)) {
+                    return;
+                }
                 facets.forEach(facet => {
                     if (facet.options && !facet.allOptionsRaw) {
                         facet.allOptionsRaw = facet.options();
