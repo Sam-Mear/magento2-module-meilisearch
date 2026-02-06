@@ -1,0 +1,115 @@
+<?xml version="1.0"?>
+
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <attribute name="class" value="page-with-filter"/>
+        <referenceContainer name="sidebar.main">
+            <block name="meilisearch.frontend.layers" template="Walkwizus_MeilisearchFrontendKnockout::layers.phtml">
+                <arguments>
+                    <argument name="jsLayout" xsi:type="array">
+                        <item name="components" xsi:type="array">
+                            <item name="meilisearch-frontend-layers" xsi:type="array">
+                                <item name="component" xsi:type="string">Walkwizus_MeilisearchFrontendKnockout/js/components/facets</item>
+                                <item name="config" xsi:type="array">
+                                    <item name="template" xsi:type="string">Walkwizus_MeilisearchFrontendKnockout/facets</item>
+                                </item>
+                                <item name="children" xsi:type="array">
+                                    <item name="meilisearch-frontend-layers-searchbox" xsi:type="array">
+                                        <item name="component" xsi:type="string">Walkwizus_MeilisearchFrontendKnockout/js/components/facets/searchbox</item>
+                                        <item name="config" xsi:type="array">
+                                            <item name="template" xsi:type="string">Walkwizus_MeilisearchFrontendKnockout/facets/searchbox</item>
+                                            <item name="displayArea" xsi:type="string">searchbox</item>
+                                        </item>
+                                    </item>
+                                    <item name="meilisearch-frontend-layers-checkbox" xsi:type="array">
+                                        <item name="component" xsi:type="string">Walkwizus_MeilisearchFrontendKnockout/js/components/facets/types/checkbox</item>
+                                        <item name="config" xsi:type="array">
+                                            <item name="template" xsi:type="string">Walkwizus_MeilisearchFrontendKnockout/facets/types/checkbox</item>
+                                            <item name="displayArea" xsi:type="string">checkbox</item>
+                                        </item>
+                                    </item>
+                                    <item name="meilisearch-frontend-layers-swatch" xsi:type="array">
+                                        <item name="component" xsi:type="string">Walkwizus_MeilisearchFrontendKnockout/js/components/facets/types/checkbox</item>
+                                        <item name="config" xsi:type="array">
+                                            <item name="template" xsi:type="string">Walkwizus_MeilisearchFrontendKnockout/facets/types/swatch</item>
+                                            <item name="displayArea" xsi:type="string">swatch</item>
+                                        </item>
+                                    </item>
+                                    <item name="meilisearch-frontend-layers-price" xsi:type="array">
+                                        <item name="component" xsi:type="string">Walkwizus_MeilisearchFrontendKnockout/js/components/facets/types/price</item>
+                                        <item name="config" xsi:type="array">
+                                            <item name="template" xsi:type="string">Walkwizus_MeilisearchFrontendKnockout/facets/types/price</item>
+                                            <item name="displayArea" xsi:type="string">price</item>
+                                        </item>
+                                    </item>
+                                </item>
+                            </item>
+                        </item>
+                    </argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+        <referenceContainer name="content">
+            <block name="meilisearch.frontend.search" class="Walkwizus\MeilisearchFrontend\Block\Search" template="Walkwizus_MeilisearchFrontendKnockout::search.phtml">
+                <block name="meilisearch.frontend.search.pagination" template="Walkwizus_MeilisearchFrontendKnockout::ssr/pagination.phtml">
+                    <arguments>
+                        <argument name="view_model" xsi:type="object">Walkwizus\MeilisearchFrontend\ViewModel\Ssr\Pagination</argument>
+                    </arguments>
+                </block>
+                <arguments>
+                    <argument name="view_model" xsi:type="object">Walkwizus\MeilisearchFrontend\ViewModel\Ssr</argument>
+                    <argument name="jsLayout" xsi:type="array">
+                        <item name="components" xsi:type="array">
+                            <item name="meilisearch-frontend-search" xsi:type="array">
+                                <item name="component" xsi:type="string">Walkwizus_MeilisearchFrontendKnockout/js/components/hits</item>
+                                <item name="config" xsi:type="array">
+                                    <item name="template" xsi:type="string">Walkwizus_MeilisearchFrontendKnockout/hits</item>
+                                </item>
+                                <item name="children" xsi:type="array">
+                                    <item name="viewmode" xsi:type="array">
+                                        <item name="component" xsi:type="string">Walkwizus_MeilisearchFrontendKnockout/js/components/viewmode</item>
+                                        <item name="config" xsi:type="array">
+                                            <item name="template" xsi:type="string">Walkwizus_MeilisearchFrontendKnockout/viewmode</item>
+                                            <item name="displayArea" xsi:type="string">viewmode</item>
+                                        </item>
+                                    </item>
+                                    <item name="counter" xsi:type="array">
+                                        <item name="component" xsi:type="string">Walkwizus_MeilisearchFrontendKnockout/js/components/counter</item>
+                                        <item name="config" xsi:type="array">
+                                            <item name="template" xsi:type="string">Walkwizus_MeilisearchFrontendKnockout/counter</item>
+                                            <item name="displayArea" xsi:type="string">counter</item>
+                                        </item>
+                                    </item>
+                                    <item name="sorter" xsi:type="array">
+                                        <item name="component" xsi:type="string">Walkwizus_MeilisearchFrontendKnockout/js/components/sorter</item>
+                                        <item name="config" xsi:type="array">
+                                            <item name="template" xsi:type="string">Walkwizus_MeilisearchFrontendKnockout/sorter</item>
+                                            <item name="displayArea" xsi:type="string">sorter</item>
+                                        </item>
+                                    </item>
+                                    <item name="pagination" xsi:type="array">
+                                        <item name="component" xsi:type="string">Walkwizus_MeilisearchFrontendKnockout/js/components/pagination</item>
+                                        <item name="config" xsi:type="array">
+                                            <item name="template" xsi:type="string">Walkwizus_MeilisearchFrontendKnockout/pagination</item>
+                                            <item name="displayArea" xsi:type="string">toolbar</item>
+                                        </item>
+                                    </item>
+                                    <item name="limiter" xsi:type="array">
+                                        <item name="component" xsi:type="string">Walkwizus_MeilisearchFrontendKnockout/js/components/limiter</item>
+                                        <item name="config" xsi:type="array">
+                                            <item name="template" xsi:type="string">Walkwizus_MeilisearchFrontendKnockout/limiter</item>
+                                            <item name="displayArea" xsi:type="string">toolbar</item>
+                                        </item>
+                                    </item>
+                                </item>
+                            </item>
+                            <item name="meilisearch-frontend-layers-url" xsi:type="array">
+                                <item name="component" xsi:type="string">Walkwizus_MeilisearchFrontendKnockout/js/components/url</item>
+                            </item>
+                        </item>
+                    </argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+    </body>
+</page>
