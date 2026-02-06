@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="before.body.end">
+            <block name="meilisearch.frontend.config" template="Walkwizus_MeilisearchFrontend::config.phtml">
+                <arguments>
+                    <argument name="view_model" xsi:type="object">Walkwizus\MeilisearchFrontend\ViewModel\JsConfig</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+        <referenceBlock name="top.search">
+            <action method="setTemplate">
+                <argument name="template" xsi:type="string">Walkwizus_MeilisearchFrontendPhtml::form.minimal.phtml</argument>
+            </action>
+        </referenceBlock>
+    </body>
+</page>
