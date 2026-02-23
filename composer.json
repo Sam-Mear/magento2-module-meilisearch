@@ -72,7 +72,11 @@
     },
     "scripts": {
         "test:unit": "vendor/bin/phpunit -c phpunit.xml.dist",
-        "phpstan": "vendor/bin/phpstan analyse"
+        "phpstan": "vendor/bin/phpstan analyse",
+        "test:coverage": [
+            "@putenv XDEBUG_MODE=coverage",
+            "phpunit --coverage-html tmp/report/"
+        ]
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
