@@ -21,9 +21,6 @@
     "require": {
         "magento/framework": ">=103.0.4"
     },
-    "require-dev": {
-        "phpunit/phpunit": "^10.5"
-    },
     "suggest": {
         "meilisearch/meilisearch-php": "Required to interact with Meilisearch API from PHP.",
         "walkwizus/magento2-module-meilisearch-breeze": "Provides optimized frontend support for Breeze-based themes.",
@@ -55,25 +52,6 @@
             "Walkwizus\\MeilisearchMerchandising\\": "src/module-meilisearch-merchandising"
         }
     },
-    "autoload-dev": {
-        "psr-4": {
-            "Walkwizus\\MeilisearchCatalog\\Test\\Unit\\": "tests/unit/Walkwizus/MeilisearchCatalog/"
-        }
-    },
-    "scripts": {
-        "test:unit": "vendor/bin/phpunit -c phpunit.xml.dist"
-    },
     "minimum-stability": "dev",
-    "prefer-stable": true,
-    "repositories": {
-        "0": {
-            "type": "composer",
-            "url": "https://repo.magento.com/"
-        }
-    },
-    "config": {
-        "allow-plugins": {
-            "magento/composer-dependency-version-audit-plugin": true
-        }
-    }
+    "prefer-stable": true
 }
