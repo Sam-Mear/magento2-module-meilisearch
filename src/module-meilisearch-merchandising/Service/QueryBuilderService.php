@@ -44,26 +44,28 @@ class QueryBuilderService
 
     /**
      * @param array $rule
+     * @param int|null $storeId
      * @return string
      */
-    public function convertRulesToMeilisearchQuery(array $rule): string
+    public function convertRulesToMeilisearchQuery(array $rule, $storeId = null): string
     {
-        return $this->buildQuery($rule);
+        return $this->buildQuery($rule, $storeId);
     }
 
     /**
      * @param array $documentData
      * @param array $rule
+     * @param int|null $storeId
      * @return bool
      */
-    public function isMatch(array $documentData, array $rule): bool
+    public function isMatch(array $documentData, array $rule, $storeId = null): bool
     {
         $condition = $rule['condition'] ?? 'AND';
 
         if (isset($rule['rules']) && is_array($rule['rules'])) {
             $results = [];
             foreach ($rule['rules'] as $subRule) {
-                $results[] = $this->isMatch($documentData, $subRule);
+                $results[] = $this->isMatch($documentData, $subRule, $storeId);
             }
 
             return ($condition === 'OR')
@@ -75,6 +77,10 @@ class QueryBuilderService
         $currentValue = $documentData[$field] ?? null;
         $operator = $rule['operator'];
         $targetValue = $rule['value'];
+
+        if (isset($rule['type']) && $rule['type'] === 'boolean') {
+            $targetValue = $this->getBooleanLabelFromValue($targetValue, $field, $storeId);
+        }
 
         return $this->evaluateCondition($currentValue, $operator, $targetValue);
     }
@@ -161,9 +167,10 @@ class QueryBuilderService
 
     /**
      * @param array $rule
+     * @param int|null $storeId
      * @return string
      */
-    private function buildQuery(array $rule): string
+    private function buildQuery(array $rule, $storeId = null): string
     {
         $meilisearchQuery = '';
         $condition = $rule['condition'] ?? 'AND';
@@ -171,7 +178,7 @@ class QueryBuilderService
         if (isset($rule['rules']) && is_array($rule['rules'])) {
             $subQueries = [];
             foreach ($rule['rules'] as $subRule) {
-                $subQuery = $this->buildQuery($subRule);
+                $subQuery = $this->buildQuery($subRule, $storeId);
                 if (!empty($subQuery)) {
                     $subQueries[] = "($subQuery)";
                 }
@@ -186,12 +193,13 @@ class QueryBuilderService
 
             if (in_array($operator, ['IN', 'NOT IN'])) {
                 $values = is_array($rule['value']) ? $rule['value'] : [$rule['value']];
-                $formattedValues = array_map(function ($val) use ($valueType) {
-                    return $this->formatValue($val, $valueType);
+                $formattedValues = array_map(function ($val) use ($valueType, $field, $storeId) {
+                    return $this->formatValue($val, $valueType, $field, $storeId);
                 }, $values);
                 $value = "[" . implode(", ", $formattedValues) . "]";
             } else {
-                $value = $this->formatValue($rule['value'], $valueType);
+                $singleValue = is_array($rule['value']) ? reset($rule['value']) : $rule['value'];
+                $value = $this->formatValue($singleValue, $valueType, $field, $storeId);
             }
 
             $meilisearchQuery = "$field $operator $value";
@@ -203,12 +211,16 @@ class QueryBuilderService
     /**
      * @param $val
      * @param $type
+     * @param string|null $attributeCode
+     * @param int|null $storeId
      * @return string|int|float
      */
-    private function formatValue($val, $type): string|int|float
+    private function formatValue($val, $type, ?string $attributeCode = null, $storeId = null): string|int|float
     {
-        if ($type === 'boolean') {
-            return $val ? '1' : '0';
+        if ($type === 'boolean' && $attributeCode) {
+            $label = $this->getBooleanLabelFromValue($val, $attributeCode, $storeId);
+            $val = str_replace('"', '\"', $label);
+            return "\"$val\"";
         }
 
         if (is_numeric($val) && strpos((string)$val, '|') === false) {
@@ -217,6 +229,40 @@ class QueryBuilderService
 
         $val = str_replace('"', '\"', (string)$val);
         return "\"$val\"";
+    }
+
+    /**
+     * @param $val
+     * @param string $attributeCode
+     * @param $storeId
+     * @return string
+     */
+    private function getBooleanLabelFromValue($val, string $attributeCode, $storeId = null): string
+    {
+        try {
+            $attribute = $this->attributeRepository->get('catalog_product', $attributeCode);
+
+            if ($storeId !== null) {
+                $attribute->setStoreId((int)$storeId);
+            }
+
+            $options = $attribute->getSource()->getAllOptions();
+            $isTrue = filter_var($val, FILTER_VALIDATE_BOOLEAN);
+
+            foreach ($options as $option) {
+                if ($isTrue && $option['value'] == '1') {
+                    return (string)$option['label'];
+                }
+
+                if (!$isTrue && ($option['value'] == '0' || $option['value'] === 0)) {
+                    return (string)$option['label'];
+                }
+            }
+        } catch (\Exception $e) {
+
+        }
+
+        return filter_var($val, FILTER_VALIDATE_BOOLEAN) ? 'Yes' : 'No';
     }
 
     /**
@@ -244,7 +290,7 @@ class QueryBuilderService
                 case 'multiselect':
                     $rule['type'] = 'string';
                     $rule['input'] = 'select';
-                    $rule['operators'] = ['in', 'not_in', 'equal', 'not_equal'];
+                    $rule['operators'] = ['in', 'not_in'];
                     $rule['multiple'] = true;
                     $rule['values'] = $this->getSelectValues($attribute['code']);
                     break;

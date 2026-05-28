@@ -49,7 +49,7 @@ class Preview extends Action implements HttpPostActionInterface
         $storeId = $this->getRequest()->getParam('storeId');
         $categoryId = $this->getRequest()->getParam('categoryId');
 
-        $filters = $this->queryBuilderService->convertRulesToMeilisearchQuery($rules);
+        $filters = $this->queryBuilderService->convertRulesToMeilisearchQuery($rules, $storeId);
         $indexName = $this->searchIndexNameResolver->getIndexName($storeId, 'catalog_product');
 
         $result = $this->searchManager->search($indexName, '', [
